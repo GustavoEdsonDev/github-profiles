@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { searchSchema } from "@/utils/schema";
 import { searchGitHubUser, type GitHubUser } from "@/api/api";
 import { Input } from "@/components/ui/input";
-import { ValidationError } from "@/components/ValidationError";
+import { Switch } from "@/components/ui/switch";
+import { ValidationError } from "@/utils/ValidationError";
+import { Moon, Sun } from "lucide-react";
 
 import "@/App.css";
 
@@ -12,6 +14,16 @@ function App() {
   const [data, setData] = useState<GitHubUser | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    // Sincroniza o tema com a classe 'dark' no documento
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDark]);
 
   const handleSearch = async () => {
     setError("");
@@ -49,7 +61,18 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground p-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2 text-primary">Digite o nome do usuário aqui</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-primary">Digite o nome do usuário aqui</h1>
+          <div className="flex items-center gap-2">
+            {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+            <Switch
+              checked={isDark}
+              onCheckedChange={setIsDark}
+              aria-label="Alternar tema escuro"
+            />
+          </div>
+        </div>
+
         <div className="mb-4 text-sm text-muted-foreground">
           <p className="mb-2"><strong>Regras:</strong></p>
           <ul className="list-disc list-inside space-y-1">
