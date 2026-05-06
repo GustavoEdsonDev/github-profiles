@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "composite": true,        // Resolve o erro "must have setting composite: true"
+    "noEmit": false,           // Resolve o erro "may not disable emit"
+    "emitDeclarationOnly": true, // Recomendado ao usar composite sem gerar JS
+    
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "strict": true
+  },
+  "include": ["vite.config.ts"]
+}
