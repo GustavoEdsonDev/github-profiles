@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { z } from "zod";
 import { searchSchema } from "@/utils/schema";
+import { searchGitHubUser, type GitHubUser } from "@/api/api";
 import { Input } from "@/components/ui/input";
 
 import "@/App.css";
 
 function App() {
   const [search, setSearch] = useState("");
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<GitHubUser | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -21,12 +22,8 @@ function App() {
       
       setLoading(true);
 
-      // Substitua pela sua URL de API real
-      const response = await fetch(`/api/search?q=${encodeURIComponent(validated.query)}`);
-      
-      if (!response.ok) throw new Error("Erro na busca");
-      
-      const result = await response.json();
+      // Busca usuário no GitHub
+      const result = await searchGitHubUser(validated.query);
       setData(result);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -114,11 +111,45 @@ function App() {
         </div>
 
         {data && (
-          <div className="p-6 bg-card border border-border rounded-lg">
-            <h2 className="font-bold mb-4 text-primary">Resultado:</h2>
-            <pre className="text-sm overflow-auto max-h-96 bg-background p-4 rounded border border-border">
-              {JSON.stringify(data, null, 2)}
-            </pre>
+          <div className="p-6 bg-card border border-border rounded-lg space-y-4">
+            <div className="flex items-start gap-4">
+              <img 
+                src={data.avatar_url} 
+                alt={data.login}
+                className="w-24 h-24 rounded-full border-2 border-primary"
+              />
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-primary">{data.name || data.login}</h2>
+                <p className="text-muted-foreground">@{data.login}</p>
+                {data.bio && <p className="mt-2">{data.bio}</p>}
+                {data.location && <p className="text-sm text-muted-foreground">📍 {data.location}</p>}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{data.public_repos}</div>
+                <p className="text-sm text-muted-foreground">Repositórios</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{data.followers}</div>
+                <p className="text-sm text-muted-foreground">Seguidores</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{data.following}</div>
+                <p className="text-sm text-muted-foreground">Seguindo</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{data.public_gists}</div>
+                <p className="text-sm text-muted-foreground">Gists</p>
+              </div>
+            </div>
+            
+            <div className="pt-4 border-t border-border text-xs text-muted-foreground space-y-1">
+              {data.company && <p>🏢 {data.company}</p>}
+              {data.blog && <p>🔗 <a href={data.blog} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{data.blog}</a></p>}
+              <p>📅 Conta criada em {new Date(data.created_at).toLocaleDateString('pt-BR')}</p>
+            </div>
           </div>
         )}
       </div>
