@@ -3,6 +3,7 @@ import { z } from "zod";
 import { searchSchema } from "@/utils/schema";
 import { searchGitHubUser, type GitHubUser } from "@/api/api";
 import { Input } from "@/components/ui/input";
+import { ValidationError } from "@/components/ValidationError";
 
 import "@/App.css";
 
@@ -95,19 +96,7 @@ function App() {
             </button>
           </div>
           
-          {error && (
-            <div className="mt-2 text-sm text-destructive flex items-center gap-2">
-              <span className="text-lg">⚠️</span>
-              <span>{error}</span>
-            </div>
-          )}
-          
-          {!error && search && (
-            <div className="mt-2 text-sm text-green-600 flex items-center gap-2">
-              <span className="text-lg">✓</span>
-              <span>Válido!</span>
-            </div>
-          )}
+          <ValidationError message={error} show={!!error} />
         </div>
 
         {data && (
