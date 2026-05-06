@@ -5,7 +5,7 @@ import { searchGitHubUser, type GitHubUser } from "@/api/api";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ValidationError } from "@/utils/ValidationError";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, MapPin, Building2, Link as LinkIcon, Calendar, Search } from "lucide-react";
 
 import "@/App.css";
 
@@ -61,9 +61,9 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground p-8">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-primary">Digite o nome do usuário aqui</h1>
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-bold text-primary">GitHub Profiles</h1>
+          <div className="flex items-center gap-3">
             {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             <Switch
               checked={isDark}
@@ -73,19 +73,10 @@ function App() {
           </div>
         </div>
 
-        <div className="mb-4 text-sm text-muted-foreground">
-          <p className="mb-2"><strong>Regras:</strong></p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Apenas letras (a-z), números (0-9) e hifens (-)</li>
-            <li>Não pode começar ou terminar com hífen</li>
-            <li>Sem hifens consecutivos (--)</li>
-            <li>Sem espaços</li>
-            <li>Máximo 39 caracteres</li>
-          </ul>
-        </div>
         <div className="mb-6">
           <div className="flex gap-2">
-            <div className="flex-1">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 placeholder="Digite para buscar... (ex: meu-usuario)"
                 value={search}
@@ -108,16 +99,21 @@ function App() {
                 onKeyPress={handleKeyPress}
                 maxLength={39}
                 aria-invalid={!!error}
+                className="pl-10"
               />
             </div>
             <button
               onClick={handleSearch}
               disabled={loading || !search || !!error}
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50 transition-opacity whitespace-nowrap cursor-pointer"
+              className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap"
             >
               {loading ? "Buscando..." : "Buscar"}
             </button>
           </div>
+          
+          <p className="mt-2 text-xs text-muted-foreground">
+            O nome do usuário deve conter apenas letras, números e hifens.
+          </p>
           
           <ValidationError message={error} show={!!error} />
         </div>
@@ -134,7 +130,12 @@ function App() {
                 <h2 className="text-2xl font-bold text-primary">{data.name || data.login}</h2>
                 <p className="text-muted-foreground">@{data.login}</p>
                 {data.bio && <p className="mt-2">{data.bio}</p>}
-                {data.location && <p className="text-sm text-muted-foreground">📍 {data.location}</p>}
+                {data.location && (
+                  <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4" />
+                    <span>{data.location}</span>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -157,10 +158,23 @@ function App() {
               </div>
             </div>
             
-            <div className="pt-4 border-t border-border text-xs text-muted-foreground space-y-1">
-              {data.company && <p>🏢 {data.company}</p>}
-              {data.blog && <p>🔗 <a href={data.blog} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{data.blog}</a></p>}
-              <p>📅 Conta criada em {new Date(data.created_at).toLocaleDateString('pt-BR')}</p>
+            <div className="pt-4 border-t border-border text-xs text-muted-foreground space-y-2">
+              {data.company && (
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  <span>{data.company}</span>
+                </div>
+              )}
+              {data.blog && (
+                <div className="flex items-center gap-2">
+                  <LinkIcon className="h-4 w-4" />
+                  <a href={data.blog} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{data.blog}</a>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <span>Conta criada em {new Date(data.created_at).toLocaleDateString('pt-BR')}</span>
+              </div>
             </div>
           </div>
         )}
