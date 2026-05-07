@@ -121,13 +121,17 @@ function App() {
         {data && (
           <div className="p-6 bg-card border border-border rounded-lg space-y-4">
             <div className="flex items-start gap-4">
-              <img 
-                src={data.avatar_url} 
-                alt={data.login}
-                className="w-24 h-24 rounded-full border-2 border-primary"
-              />
+              <a href={data.html_url} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                <img 
+                  src={data.avatar_url} 
+                  alt={data.login}
+                  className="w-24 h-24 rounded-full border-2 border-primary cursor-pointer"
+                />
+              </a>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-primary">{data.name || data.login}</h2>
+                <a href={data.html_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  <h2 className="text-2xl font-bold text-primary">{data.name || data.login}</h2>
+                </a>
                 <p className="text-muted-foreground">@{data.login}</p>
                 {data.bio && <p className="mt-2">{data.bio}</p>}
                 {data.location && (
