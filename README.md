@@ -174,7 +174,6 @@ A aplicação segue boas práticas de acessibilidade:
 - [ ] Histórico de buscas
 - [ ] Comparação entre usuários
 - [ ] Integração com autenticação GitHub (OAuth)
-- [ ] Deploy na produção
 
 ## 📄 Licença
 
