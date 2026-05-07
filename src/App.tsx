@@ -4,6 +4,8 @@ import { searchSchema } from "@/utils/schema";
 import { searchGitHubUser, type GitHubUser } from "@/api/api";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { ValidationError } from "@/utils/ValidationError";
 import { Moon, Sun, MapPin, Building2, Link as LinkIcon, Calendar, Search } from "lucide-react";
 
@@ -83,18 +85,19 @@ function App() {
                 onChange={(e) => {
                   const value = e.target.value;
                   setSearch(value);
-                  setError("");
                   
-                  // Validação em tempo real
+                  // Validação em tempo real - só valida se há texto
                   if (value.trim()) {
                     try {
                       searchSchema.parse({ query: value });
+                      setError(""); // Limpa erro se válido
                     } catch (err) {
                       if (err instanceof z.ZodError) {
                         setError(err.issues[0]?.message || "Erro de validação");
                       }
                     }
                   }
+                  // Se vazio, mantém o erro anterior
                 }}
                 onKeyPress={handleKeyPress}
                 maxLength={39}
@@ -119,68 +122,74 @@ function App() {
         </div>
 
         {data && (
-          <div className="p-6 bg-card border border-border rounded-lg space-y-4">
-            <div className="flex items-start gap-4">
-              <a href={data.html_url} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-                <img 
-                  src={data.avatar_url} 
-                  alt={data.login}
-                  className="w-24 h-24 rounded-full border-2 border-primary cursor-pointer"
-                />
-              </a>
-              <div className="flex-1">
-                <a href={data.html_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                  <h2 className="text-2xl font-bold text-primary">{data.name || data.login}</h2>
+          <main>
+            <Card>
+              <CardHeader className="flex flex-row items-start gap-4">
+                <a href={data.html_url} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                  <img 
+                    src={data.avatar_url} 
+                    alt={data.login}
+                    className="w-24 h-24 rounded-full border-2 border-primary cursor-pointer"
+                  />
                 </a>
-                <p className="text-muted-foreground">@{data.login}</p>
-                {data.bio && <p className="mt-2">{data.bio}</p>}
-                {data.location && (
-                  <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>{data.location}</span>
+                <div className="flex-1">
+                  <a href={data.html_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    <CardTitle>{data.name || data.login}</CardTitle>
+                  </a>
+                  <CardDescription className="mt-1">@{data.login}</CardDescription>
+                  {data.bio && <p className="mt-2 text-sm text-foreground">{data.bio}</p>}
+                  {data.location && (
+                    <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span>{data.location}</span>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <Separator />
+
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">{data.public_repos}</div>
+                    <p className="text-sm text-muted-foreground">Repositórios</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">{data.followers}</div>
+                    <p className="text-sm text-muted-foreground">Seguidores</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">{data.following}</div>
+                    <p className="text-sm text-muted-foreground">Seguindo</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">{data.public_gists}</div>
+                    <p className="text-sm text-muted-foreground">Gists</p>
+                  </div>
+                </div>
+              </CardContent>
+              <Separator />
+
+              <CardFooter className="flex flex-col gap-2 text-xs text-muted-foreground">
+                {data.company && (
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4" />
+                    <span>{data.company}</span>
                   </div>
                 )}
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{data.public_repos}</div>
-                <p className="text-sm text-muted-foreground">Repositórios</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{data.followers}</div>
-                <p className="text-sm text-muted-foreground">Seguidores</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{data.following}</div>
-                <p className="text-sm text-muted-foreground">Seguindo</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{data.public_gists}</div>
-                <p className="text-sm text-muted-foreground">Gists</p>
-              </div>
-            </div>
-            
-            <div className="pt-4 border-t border-border text-xs text-muted-foreground space-y-2">
-              {data.company && (
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  <span>{data.company}</span>
+                {data.blog && (
+                  <div className="flex items-center gap-2">
+                    <LinkIcon className="h-4 w-4" />
+                    <a href={data.blog} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{data.blog}</a>
+                  </div>
+                )}
+                <div className="flex items-center gap-2 p-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>Conta criada em {new Date(data.created_at).toLocaleDateString('pt-BR')}</span>
                 </div>
-              )}
-              {data.blog && (
-                <div className="flex items-center gap-2">
-                  <LinkIcon className="h-4 w-4" />
-                  <a href={data.blog} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{data.blog}</a>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>Conta criada em {new Date(data.created_at).toLocaleDateString('pt-BR')}</span>
-              </div>
-            </div>
-          </div>
+              </CardFooter>
+            </Card>
+          </main>
         )}
       </div>
     </div>
